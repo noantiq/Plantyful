@@ -1,90 +1,78 @@
 package ui.detail
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.screen.Screen
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import dataClasses.Plant
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format
-import kotlinx.datetime.format.*
-import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import ui.overview.PlantOverviewViewModel
+import plantyful.composeapp.generated.resources.Res
+import plantyful.composeapp.generated.resources.watered_last_at
+import ui.ScaffoldViewModel
+import ui.overview.getCurrentDate
+import ui.overview.smallPadding
 import kotlin.time.Duration.Companion.days
 
-data class PlantDetailScreen(
-    val viewModel: PlantOverviewViewModel,
-    val index: Int,
-    val onWatering: () -> Unit
-) : Screen {
-    @Composable
-    override fun Content() {
-        PlantDetail(viewModel.plants[index], onWatering)
-    }
-}
-
+@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun PlantDetail(
-    plant: Plant,
-    onWatering: () -> Unit
+fun PlantDetailScreen(
+    paddingValues: PaddingValues,
+    horizontalPadding: Dp,
+    scaffoldViewModel: ScaffoldViewModel,
+    content: Plant,
+    waterPlant: (Plant) -> Unit
 ) {
-    Column {
-        Text(plant.name)
+    var plant by remember { mutableStateOf(content) }
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(horizontal = horizontalPadding),
+        verticalArrangement = Arrangement.spacedBy(smallPadding)
+    ) {
         plant.description?.let { Text(it) }
         plant.picture?.let { Image(it, "alt") } //TODO
-        plant.wateringCycle?.let { Text("alle ${it.days} Tage") }
-        plant.lastTimeWatered?.let { wateringDate ->
-            Text(wateringDate.format(LocalDate.Formats.ISO))
-            plant.wateringCycle?.let { cycle ->
-                if (wateringDate.daysUntil(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date).days.inWholeDays > cycle.days) {
-                    Text("Achtung! Pflanze gießen")
-                }
+        plant.wateringInfo?.let { Text("alle ${it.cycle.inWholeDays} Tage") }
+        plant.wateringInfo?.let { wateringInfo ->
+            Text(
+                stringResource(
+                    Res.string.watered_last_at,
+                    wateringInfo.lastTime.format(LocalDate.Formats.ISO)
+                )
+            )
+
+            if (wateringInfo.lastTime.daysUntil(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date).days.inWholeDays > wateringInfo.cycle.inWholeDays) {
+                Text("Achtung! Pflanze gießen")
             }
         }
         plant.ownedSince?.let { Text(it.format(LocalDate.Formats.ISO)) }
         Button(
             onClick = {
-                onWatering()
+                plant = plant.copy(
+                    wateringInfo = plant.wateringInfo?.copy(lastTime = getCurrentDate())
+                )
+                waterPlant(plant)
             }
         ) {
             Text("gießen")
         }
     }
 }
-
-
-/**
- * Previews
- */
-
-@Composable
-private fun PlantDetailScreenPreview(plant: Plant) {
-    MaterialTheme {
-        PlantDetail(plant) {}
-    }
-}
-
-@Preview
-@Composable
-private fun PlantDetailScreenPreview1() = PlantDetailScreenPreview(
-    Plant(
-        name = "Planty"
-    )
-)
-
-@Preview
-@Composable
-private fun PlantDetailScreenPreview2() = PlantDetailScreenPreview(
-    Plant(
-        name = "Planty",
-        description = "This is a beautiful, yet small plant that needs a lot of sun and stuff!"
-    )
-)

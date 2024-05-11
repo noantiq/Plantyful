@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Plantyful</string>
+
+    <string name="back">back</string>
+
+    <string name="add_plant">Add plant</string>
+    <string name="edit_plant">Edit plant</string>
+
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="watering_cycle_in_days">Watering cycle in days</string>
+
+    <string name="watered_last_at">Watered last at %1$s</string>
+
+    <string name="save">save</string>
+    <string name="edit">edit</string>
+    <string name="delete">delete</string>
+
+    <string name="water">water</string>
+    <string name="watered_plant">Watered %1$s</string>
+
+    <string name="deleted_plant">Deleted %1$s</string>
+
+    <string name="in_x_days">in %1$d days</string>
+    <string name="x_days_ago">%1$d days ago</string>
+    <string name="today">Today</string>
+
+    <string name="daily">daily</string>
+    <string name="weekly">weekly</string>
+    <string name="biweekly">biweekly</string>
+    <string name="monthly">monthly</string>
+    <string name="every_x_days">every %1$d days</string>
+    <string name="every_x_weeks">every %1$d weeks</string>
+    <string name="every_x_months">every %1$d months</string>
+</resources>

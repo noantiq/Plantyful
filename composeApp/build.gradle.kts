@@ -1,11 +1,15 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+val appVersion = "1.0.0"
+val appVersionCode = 1
+val appIdentifier = "de.plantyful"
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -29,18 +33,32 @@ kotlin {
             }
         }
         commonMain.dependencies {
+            implementation(projects.shared)
+
+            // compose
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(projects.shared)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.voyager.navigator)
+            implementation(compose.material3)
+            //implementation(compose.materialIconsExtended)
+            implementation(libs.material.icons)
+
+            // viewmodel
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+            // kotlin date and time library
+            implementation(libs.kotlinx.datetime)
+
+            // KMP screen navigation
+            implementation(libs.androidx.navigation.compose)
+
+            // local database
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -49,7 +67,7 @@ kotlin {
 }
 
 android {
-    namespace = "de.plantyful"
+    namespace = appIdentifier
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -57,11 +75,11 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "de.plantyful"
+        applicationId = appIdentifier
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -88,8 +106,16 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "de.plantyful"
-            packageVersion = "1.0.0"
+            packageName = appIdentifier
+            packageVersion = appVersion
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    ksp(libs.androidx.room.compiler)
 }
