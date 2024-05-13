@@ -46,8 +46,10 @@ import plantyful.composeapp.generated.resources.every_x_weeks
 import plantyful.composeapp.generated.resources.in_x_days
 import plantyful.composeapp.generated.resources.monthly
 import plantyful.composeapp.generated.resources.today
+import plantyful.composeapp.generated.resources.tomorrow
 import plantyful.composeapp.generated.resources.weekly
 import plantyful.composeapp.generated.resources.x_days_ago
+import plantyful.composeapp.generated.resources.yesterday
 import ui.detail.navigateToPlantDetail
 
 val smallPadding = 8.dp
@@ -158,6 +160,8 @@ private fun PlantCard(
                             iconImageVector = Icons.Default.Schedule,
                             text = wateringInfo.daysUntilDue.let { daysLeft ->
                                 when {
+                                    daysLeft == 1 -> stringResource(Res.string.tomorrow)
+                                    daysLeft == -1 -> stringResource(Res.string.yesterday)
                                     daysLeft > 0 -> stringResource(Res.string.in_x_days, daysLeft)
                                     daysLeft < 0 -> stringResource(Res.string.x_days_ago, - daysLeft)
                                     else -> stringResource(Res.string.today)

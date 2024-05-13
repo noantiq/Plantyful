@@ -24,6 +24,8 @@
     <string name="in_x_days">in %1$d Tagen</string>
     <string name="x_days_ago">vor %1$d Tagen</string>
     <string name="today">Heute</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="yesterday">Gestern</string>
 
     <string name="daily">täglich</string>
     <string name="weekly">wöchentlich</string>
