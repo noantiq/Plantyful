@@ -1,5 +1,6 @@
 package ui
 
+import OnStartEffect
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -7,10 +8,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
@@ -23,7 +22,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.add_plant
-import plantyful.composeapp.generated.resources.edit
 import plantyful.composeapp.generated.resources.edit_plant
 import plantyful.composeapp.generated.resources.save
 
@@ -102,18 +100,21 @@ fun NavGraphBuilder.plantEditScreen(
             val plantState: MutableState<Plant?> = remember { mutableStateOf(null) }
 
             plantState.value?.let { plant ->
-                scaffoldViewModel.apply {
-                    reset(stringResource(Res.string.edit_plant))
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                //TODO
+                val title = stringResource(Res.string.edit_plant)
+                OnStartEffect {
+                    scaffoldViewModel.apply {
+                        reset(title)
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    //TODO
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Save,
+                                    contentDescription = stringResource(Res.string.save)
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Save,
-                                contentDescription = stringResource(Res.string.save)
-                            )
                         }
                     }
                 }

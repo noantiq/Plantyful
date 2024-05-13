@@ -1,5 +1,6 @@
 package ui.detail
 
+import OnStartEffect
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -28,7 +29,6 @@ import plantyful.composeapp.generated.resources.add_plant
 import plantyful.composeapp.generated.resources.delete
 import plantyful.composeapp.generated.resources.edit
 import ui.ScaffoldViewModel
-import ui.navigateToPlantCreate
 import ui.navigateToPlantEdit
 
 const val plantDetailRoute = "detail"
@@ -61,39 +61,41 @@ fun NavGraphBuilder.plantDetailScreen(
             val lifecycleOwner = LocalLifecycleOwner.current
             val plantState: MutableState<Plant?> = remember { mutableStateOf(null) }
             plantState.value?.let { plant ->
-                scaffoldViewModel.apply {
-                    reset(plant.name)
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { waterPlant(plant) },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.WaterDrop,
-                                contentDescription = stringResource(Res.string.add_plant)
-                            )
-                        }
-                    }
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                deletePlant(plant)
-                                navController.popBackStack()
+                OnStartEffect {
+                    scaffoldViewModel.apply {
+                        reset(plant.name)
+                        floatingActionButton = {
+                            FloatingActionButton(
+                                onClick = { waterPlant(plant) },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.WaterDrop,
+                                    contentDescription = stringResource(Res.string.add_plant)
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(Res.string.delete)
-                            )
                         }
-                        IconButton(
-                            onClick = {
-                                navController.navigateToPlantEdit(lifecycleOwner, plant.id)
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    deletePlant(plant)
+                                    navController.popBackStack()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(Res.string.delete)
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(Res.string.edit)
-                            )
+                            IconButton(
+                                onClick = {
+                                    navController.navigateToPlantEdit(lifecycleOwner, plant.id)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(Res.string.edit)
+                                )
+                            }
                         }
                     }
                 }

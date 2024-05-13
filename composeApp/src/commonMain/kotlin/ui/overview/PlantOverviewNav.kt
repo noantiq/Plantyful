@@ -1,9 +1,9 @@
 package ui.overview
 
+import OnStartEffect
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -47,21 +47,25 @@ fun NavGraphBuilder.plantOverviewScreen(
         route = plantOverviewRoute
     ) {
         val lifecycleOwner = LocalLifecycleOwner.current
-        scaffoldViewModel.apply {
-            reset(stringResource(Res.string.app_name))
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigateToPlantCreate(lifecycleOwner)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(Res.string.add_plant)
-                    )
+        val appName = stringResource(Res.string.app_name)
+        OnStartEffect {
+            scaffoldViewModel.apply {
+                reset(appName)
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigateToPlantCreate(lifecycleOwner)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(Res.string.add_plant)
+                        )
+                    }
                 }
             }
         }
+
         PlantOverviewScreen(
             paddingValues = paddingValues,
             horizontalPadding = horizontalPadding,
