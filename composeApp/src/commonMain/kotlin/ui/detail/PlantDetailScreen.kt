@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,10 +23,8 @@ import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.watered_last_at
-import ui.ScaffoldViewModel
 import ui.overview.getCurrentDate
 import ui.overview.smallPadding
 import kotlin.time.Duration.Companion.days
@@ -37,7 +34,6 @@ import kotlin.time.Duration.Companion.days
 fun PlantDetailScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
-    scaffoldViewModel: ScaffoldViewModel,
     content: Plant,
     waterPlant: (Plant) -> Unit
 ) {

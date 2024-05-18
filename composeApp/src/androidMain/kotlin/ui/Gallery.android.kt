@@ -1,6 +1,5 @@
 package ui
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult

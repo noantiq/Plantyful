@@ -49,7 +49,7 @@ fun PlantCreationScreen(
     savePlant: (Plant) -> Unit,
     plant: Plant? = null
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
+    LocalLifecycleOwner.current
     val nameState = remember { mutableStateOf(plant?.name ?: "") }
     val speciesState = remember { mutableStateOf(plant?.species ?: "") }
     val pictureState = remember { mutableStateOf(plant?.picture) }

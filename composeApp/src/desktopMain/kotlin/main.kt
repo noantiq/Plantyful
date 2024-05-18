@@ -1,3 +1,4 @@
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import database.getPlantDatabaseBuilder
@@ -7,6 +8,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "Plantyful",
     ) {
-        App(getPlantDatabaseBuilder())
+        val database = remember { getPlantDatabaseBuilder() }
+        App(database)
     }
 }

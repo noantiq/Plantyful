@@ -102,7 +102,6 @@ fun NavGraphBuilder.plantDetailScreen(
                 PlantDetailScreen(
                     paddingValues = paddingValues,
                     horizontalPadding = horizontalPadding,
-                    scaffoldViewModel = scaffoldViewModel,
                     content = plant,
                     waterPlant = waterPlant
                 )

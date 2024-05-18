@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -28,25 +29,19 @@ kotlin {
         
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose.get().let { "${it.module}:${it.versionConstraint.requiredVersion}" }) {
-                exclude(group = "androidx.lifecycle", module = "lifecycle-viewmodel-ktx")
-            }
+            implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(projects.shared)
+            //implementation(projects.shared)
 
             // compose
-            implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.material3)
-            //implementation(compose.materialIconsExtended)
-            implementation(libs.material.icons)
+            implementation(compose.materialIconsExtended)
 
             // viewmodel
-            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
 
             // kotlin date and time library
@@ -106,8 +101,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = appIdentifier
-            packageVersion = appVersion
+            packageName = "de.plantyful"
+            packageVersion = "1.0.0"
         }
     }
 }

@@ -7,15 +7,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dataClasses.Plant
 import database.PlantDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 
 
-class PlantOverviewViewModel: ViewModel() {
+class PlantOverviewViewModel: ViewModel(CoroutineScope(Dispatchers.IO)) {
 
     var dao: MutableStateFlow<PlantDao?> = MutableStateFlow(null)
     var plants: List<Plant> by mutableStateOf(emptyList())

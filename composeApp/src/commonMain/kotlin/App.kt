@@ -1,5 +1,8 @@
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -12,29 +15,29 @@ import database.getRoomDatabase
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.deleted_plant
 import plantyful.composeapp.generated.resources.watered_plant
 import ui.ScaffoldViewModel
-import ui.plantCreationScreen
+import ui.detail.plantDetailScreen
 import ui.overview.PlantOverviewViewModel
 import ui.overview.getCurrentDate
-import ui.detail.plantDetailScreen
 import ui.overview.plantOverviewRoute
 import ui.overview.plantOverviewScreen
+import ui.plantCreationScreen
 import ui.plantEditScreen
 import ui.theme.PlantyTheme
 import kotlin.time.Duration.Companion.days
 
 var addDebugItems = false
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 @Preview
-fun App(databaseBuilder: RoomDatabase.Builder<PlantDatabase>) {
+fun App(
+    databaseBuilder: RoomDatabase.Builder<PlantDatabase>
+) {
     val database = remember { getRoomDatabase(databaseBuilder) }
     val plantDao = remember { database.getDao() }
 
