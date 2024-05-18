@@ -48,6 +48,7 @@ fun PlantDetailScreen(
             .padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(smallPadding)
     ) {
+        plant.species?.let { Text(it) }
         plant.description?.let { Text(it) }
         plant.picture?.let { Image(it, "alt") } //TODO
         plant.wateringInfo?.let { Text("alle ${it.cycle.inWholeDays} Tage") }

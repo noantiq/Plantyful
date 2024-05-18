@@ -1,14 +1,17 @@
 package ui.overview
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -50,6 +54,7 @@ import plantyful.composeapp.generated.resources.tomorrow
 import plantyful.composeapp.generated.resources.weekly
 import plantyful.composeapp.generated.resources.x_days_ago
 import plantyful.composeapp.generated.resources.yesterday
+import ui.crop
 import ui.detail.navigateToPlantDetail
 
 val smallPadding = 8.dp
@@ -110,16 +115,33 @@ private fun PlantCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Icon(
-                    modifier = Modifier.padding(end = mediumPadding),
-                    imageVector = Icons.Default.Yard,
-                    contentDescription = null
-                )
+                Box(Modifier.padding(end = mediumPadding)){
+                    plant.croppedPicture?.let {
+                        Card(modifier = Modifier.size(60.dp)) {
+                            Image(
+                                bitmap = it,
+                                contentDescription = null,//TODO
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                    } ?: Icon(
+                        imageVector = Icons.Default.Yard,
+                        contentDescription = null
+                    )
+                }
+
 
                 Column {
                     Text(
-                        text = plant.name,
-                        style = MaterialTheme.typography.titleMedium
+                        text = "${plant.name}${
+                            plant.species?.let { 
+                                " ($it)"
+                            } ?: ""
+                        }",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     plant.description?.let {
                         Text(

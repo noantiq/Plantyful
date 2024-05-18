@@ -9,25 +9,30 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
+import ui.crop
 import ui.overview.getCurrentDate
 import kotlin.time.Duration
 
 @Entity
-data class Plant (
+data class Plant(
     var name: String,
-
     var description: String? = null,
-
+    var species: String? = null,
     var picture: ImageBitmap? = null,
-
-    @Embedded
-    var wateringInfo: WateringInfo? = null,
-
+    @Embedded var wateringInfo: WateringInfo? = null,
     var ownedSince: LocalDate? = null,
-
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
-) {}
+    @PrimaryKey(autoGenerate = true) val id: Long = 0
+) {
+    @Ignore
+    val croppedPicture: ImageBitmap? = picture?.let {
+        it.crop(
+            it.width / 4,
+            it.height / 4,
+            it.width / 2,
+            it.height / 2
+        )
+    }
+}
 
 data class WateringInfo(
     var cycle: Duration,

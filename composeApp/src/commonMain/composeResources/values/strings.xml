@@ -7,6 +7,7 @@
     <string name="edit_plant">Edit plant</string>
 
     <string name="name">Name</string>
+    <string name="species">Species</string>
     <string name="description">Description</string>
     <string name="watering_cycle_in_days">Watering cycle in days</string>
 

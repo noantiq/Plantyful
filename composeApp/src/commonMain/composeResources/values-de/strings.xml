@@ -7,6 +7,7 @@
     <string name="edit_plant">Pflanze bearbeiten</string>
 
     <string name="name">Name</string>
+    <string name="species">Art</string>
     <string name="description">Beschreibung</string>
     <string name="watering_cycle_in_days">Gießzyklus in Tagen</string>
 

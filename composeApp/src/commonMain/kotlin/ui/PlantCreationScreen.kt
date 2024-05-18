@@ -1,5 +1,6 @@
 package ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,9 +36,9 @@ import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.description
 import plantyful.composeapp.generated.resources.name
+import plantyful.composeapp.generated.resources.species
 import plantyful.composeapp.generated.resources.watering_cycle_in_days
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
@@ -50,6 +51,8 @@ fun PlantCreationScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val nameState = remember { mutableStateOf(plant?.name ?: "") }
+    val speciesState = remember { mutableStateOf(plant?.species ?: "") }
+    val pictureState = remember { mutableStateOf(plant?.picture) }
     val descriptionState = remember { mutableStateOf(plant?.description ?: "") }
     val cycleState = remember { mutableStateOf(plant?.wateringInfo?.cycle?.inWholeDays?.toInt()?.toString() ?: "") }
     val lastTimeWateredDatePickerState = rememberDatePickerState(
@@ -68,11 +71,28 @@ fun PlantCreationScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val galleryManager = rememberGalleryManager { imageBitmap ->
+            imageBitmap?.let { pictureState.value = it }
+        }
+
+        Button(galleryManager::launch) {
+            Text("Choose picture")
+        }
+
+        pictureState.value?.let { Image(it, null) }
+
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = nameState.value,
             onValueChange = { value -> nameState.value = value},
             label = { Text(stringResource(Res.string.name)) }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = speciesState.value,
+            onValueChange = { value -> speciesState.value = value},
+            label = { Text(stringResource(Res.string.species)) }
         )
 
         OutlinedTextField(
@@ -124,7 +144,9 @@ fun PlantCreationScreen(
                     savePlant(
                         (plant ?: Plant("")).copy(
                             name = nameState.value,
-                            description = descriptionState.value,
+                            description = descriptionState.value.ifBlank { null },
+                            species = speciesState.value.ifBlank { null },
+                            picture = pictureState.value,
                             wateringInfo = WateringInfo(
                                 cycle = cycleState.value.toInt().days,
                                 lastTime = dateState!!
