@@ -4,68 +4,61 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import dataClasses.Plant
 import database.PlantDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 
 
-class PlantOverviewViewModel: ViewModel(CoroutineScope(Dispatchers.IO)) {
+class PlantOverviewViewModel(private val dao: PlantDao) : ViewModel(CoroutineScope(Dispatchers.IO)) {
 
-    var dao: MutableStateFlow<PlantDao?> = MutableStateFlow(null)
+    companion object {
+        fun factory(dao: PlantDao) = viewModelFactory { initializer { PlantOverviewViewModel(dao) } }
+    }
+
     var plants: List<Plant> by mutableStateOf(emptyList())
 
     init {
         viewModelScope.launch {
-            dao.collect { plantDao ->
-                if (plantDao != null) {
-                    updatePlants(plantDao)
-                }
-            }
+            updatePlants(dao)
         }
     }
 
     fun updateLastTimeWatered(plant: Plant) {
         viewModelScope.launch {
-            dao.value?.let { plantDao ->
-                plantDao.update(plant)
-                updatePlants(plantDao)
-            }
+            dao.update(plant)
+            updatePlants(dao)
         }
     }
 
     fun addPlant(plant: Plant) {
         viewModelScope.launch {
-            dao.value?.let { plantDao ->
-                plantDao.insert(plant)
-                updatePlants(plantDao)
-            }
+            dao.insert(plant)
+            updatePlants(dao)
         }
     }
 
     fun delete(plant: Plant) {
         viewModelScope.launch {
-            dao.value?.let { plantDao ->
-                plantDao.delete(plant)
-                updatePlants(plantDao)
-            }
+            dao.delete(plant)
+            updatePlants(dao)
         }
     }
 
     fun editPlant(plant: Plant) {
         viewModelScope.launch {
-            dao.value?.let { plantDao ->
-                plantDao.update(plant)
-                updatePlants(plantDao)
-            }
+            dao.update(plant)
+            updatePlants(dao)
         }
     }
 

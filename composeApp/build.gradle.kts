@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -21,18 +20,51 @@ kotlin {
             }
         }
     }
-    
+
     jvm("desktop")
-    
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
+
     sourceSets {
-        val desktopMain by getting
-        
+        all {
+            languageSettings {
+                optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+            }
+        }
+
+        val commonMain by getting
+        val jbMain by creating {
+            dependsOn(commonMain)
+        }
+        val desktopMain by getting {
+            dependsOn(jbMain)
+        }
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(jbMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+        }
+
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            //implementation(projects.shared)
+            implementation(libs.androidx.lifecycle.runtime)
 
             // compose
             implementation(compose.foundation)
@@ -42,7 +74,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
 
             // viewmodel
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.lifecycle.viewmodel)
 
             // kotlin date and time library
             implementation(libs.kotlinx.datetime)

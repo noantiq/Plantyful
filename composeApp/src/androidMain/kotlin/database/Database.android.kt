@@ -1,6 +1,5 @@
-package de.plantyful.database
+package database
 
-import database.PlantDatabase
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase

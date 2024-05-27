@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.minus
 import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.deleted_plant
 import plantyful.composeapp.generated.resources.watered_plant
@@ -34,10 +33,7 @@ import kotlin.time.Duration.Companion.days
 var addDebugItems = false
 
 @Composable
-@Preview
-fun App(
-    databaseBuilder: RoomDatabase.Builder<PlantDatabase>
-) {
+fun App(databaseBuilder: RoomDatabase.Builder<PlantDatabase>) {
     val database = remember { getRoomDatabase(databaseBuilder) }
     val plantDao = remember { database.getDao() }
 
@@ -45,9 +41,8 @@ fun App(
 
     PlantyTheme {
         val navController = rememberNavController()
-        val scaffoldViewModel: ScaffoldViewModel = viewModel()
-        val viewModel: PlantOverviewViewModel = viewModel()
-        viewModel.dao.value = plantDao
+        val scaffoldViewModel: ScaffoldViewModel = viewModel { ScaffoldViewModel() }
+        val viewModel: PlantOverviewViewModel = viewModel(factory = PlantOverviewViewModel.factory(plantDao))
         val scope = rememberCoroutineScope()
         val waterPlant: (Plant) -> Unit = { plant: Plant ->
             viewModel.updateLastTimeWatered(
