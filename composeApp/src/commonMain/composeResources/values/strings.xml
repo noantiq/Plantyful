@@ -2,6 +2,7 @@
     <string name="app_name">Plantyful</string>
 
     <string name="back">back</string>
+    <string name="undo">Undo</string>
 
     <string name="add_plant">Add plant</string>
     <string name="edit_plant">Edit plant</string>

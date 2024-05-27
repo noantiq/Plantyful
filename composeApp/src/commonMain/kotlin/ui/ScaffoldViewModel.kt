@@ -13,6 +13,7 @@ class ScaffoldViewModel: ViewModel() {
     var title: String by mutableStateOf("")
     var actions: @Composable (RowScope.() -> Unit) by mutableStateOf({})
     var floatingActionButton: @Composable () -> Unit by mutableStateOf({})
+    var undoAction: (() -> Unit) ? by mutableStateOf(null)
     var snackBarMessage: String? by mutableStateOf(null)
     @OptIn(ExperimentalMaterial3Api::class)
     var topAppBarState by mutableStateOf(TopAppBarState(-Float.MAX_VALUE, 0f, 0f))

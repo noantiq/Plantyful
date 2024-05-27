@@ -7,8 +7,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -19,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.back
+import plantyful.composeapp.generated.resources.undo
 import ui.ScaffoldViewModel
 import ui.overview.mediumPadding
 
@@ -35,7 +39,19 @@ fun PlantyScaffold(
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(viewModel.snackBarMessage) {
         viewModel.snackBarMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            val result = snackbarHostState.showSnackbar(
+                message = it,
+                actionLabel = getString(Res.string.undo),
+                duration = SnackbarDuration.Short
+            )
+            when (result) {
+                SnackbarResult.ActionPerformed -> {
+                    viewModel.undoAction?.invoke()
+                    viewModel.undoAction = null
+                }
+                SnackbarResult.Dismissed -> {}
+            }
+
             viewModel.snackBarMessage = null
         }
     }

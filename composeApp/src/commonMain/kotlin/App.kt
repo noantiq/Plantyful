@@ -45,18 +45,32 @@ fun App(databaseBuilder: RoomDatabase.Builder<PlantDatabase>) {
         val viewModel: PlantOverviewViewModel = viewModel(factory = PlantOverviewViewModel.factory(plantDao))
         val scope = rememberCoroutineScope()
         val waterPlant: (Plant) -> Unit = { plant: Plant ->
+            val initialLastTimeWatered = plant.wateringInfo?.lastTime
             viewModel.updateLastTimeWatered(
                 plant.copy(
                     wateringInfo = plant.wateringInfo?.copy(
-                        lastTime = getCurrentDate())
+                        lastTime = getCurrentDate()
+                    )
                 )
             )
+            scaffoldViewModel.undoAction = {
+                viewModel.updateLastTimeWatered(
+                    plant.copy(
+                        wateringInfo = initialLastTimeWatered?.let {
+                            plant.wateringInfo?.copy(
+                                lastTime = it
+                            )
+                        }
+                    )
+                )
+            }
             scope.launch {
                 scaffoldViewModel.snackBarMessage = getString(Res.string.watered_plant, plant.name)
             }
         }
         val deletePlant: (Plant) -> Unit = { plant: Plant ->
             viewModel.delete(plant)
+            scaffoldViewModel.undoAction = { viewModel.addPlant(plant) }
             scope.launch {
                 scaffoldViewModel.snackBarMessage = getString(Res.string.deleted_plant, plant.name)
             }
