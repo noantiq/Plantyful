@@ -33,13 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dataClasses.Plant
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.biweekly
@@ -54,7 +52,6 @@ import plantyful.composeapp.generated.resources.tomorrow
 import plantyful.composeapp.generated.resources.weekly
 import plantyful.composeapp.generated.resources.x_days_ago
 import plantyful.composeapp.generated.resources.yesterday
-import ui.crop
 import ui.detail.navigateToPlantDetail
 
 val smallPadding = 8.dp
@@ -72,28 +69,22 @@ fun PlantOverviewScreen(
     waterPlant: (Plant) -> Unit,
     viewModel: PlantOverviewViewModel
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
     LazyColumn(
         contentPadding = paddingValues,
         modifier = Modifier.padding(horizontal = horizontalPadding),
         verticalArrangement = Arrangement.spacedBy(smallPadding)
     ) {
         items(viewModel.plants) { plant ->
+            val navigateToDetail: () -> Unit = navController.navigateToPlantDetail(plant.id)
             PlantCard(
                 plant = plant,
-                navigateToDetail = {
-                    navController.navigateToPlantDetail(
-                        lifecycleOwner = lifecycleOwner,
-                        plantId = plant.id
-                    )
-                },
+                navigateToDetail = navigateToDetail,
                 waterPlant = { waterPlant(plant) }
             )
         }
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun PlantCard(
     plant: Plant,

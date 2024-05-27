@@ -9,20 +9,19 @@ import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import composeNavigation
 import dataClasses.Plant
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import navigateOnClick
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.add_plant
@@ -33,17 +32,10 @@ import ui.navigateToPlantEdit
 
 const val plantDetailRoute = "detail"
 
-fun NavController.navigateToPlantDetail(
-    lifecycleOwner: LifecycleOwner,
-    plantId: Long,
-    navOptions: NavOptions? = null,
-) {
-    composeNavigation(lifecycleOwner) {
-        this.navigate("$plantDetailRoute/$plantId", navOptions)
-    }
-}
+@Composable
+fun NavController.navigateToPlantDetail(plantId: Long, navOptions: NavOptions? = null) =
+    navigateOnClick("$plantDetailRoute/$plantId", navOptions)
 
-@OptIn(ExperimentalResourceApi::class)
 fun NavGraphBuilder.plantDetailScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
@@ -86,11 +78,8 @@ fun NavGraphBuilder.plantDetailScreen(
                                     contentDescription = stringResource(Res.string.delete)
                                 )
                             }
-                            IconButton(
-                                onClick = {
-                                    navController.navigateToPlantEdit(lifecycleOwner, plant.id)
-                                }
-                            ) {
+                            val navigateToEdit: () -> Unit = navController.navigateToPlantEdit(plant.id)
+                            IconButton(onClick = navigateToEdit) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
                                     contentDescription = stringResource(Res.string.edit)

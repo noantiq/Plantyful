@@ -6,15 +6,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import composeNavigation
 import dataClasses.Plant
+import navigateOnClick
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
@@ -25,16 +25,10 @@ import ui.navigateToPlantCreate
 
 const val plantOverviewRoute = "overview"
 
-fun NavController.navigateToPlantOverview(
-    lifecycleOwner: LifecycleOwner,
-    navOptions: NavOptions? = null,
-) {
-    composeNavigation(lifecycleOwner) {
-        this.navigate(plantOverviewRoute, navOptions)
-    }
-}
+@Composable
+fun NavController.navigateToPlantOverview(navOptions: NavOptions? = null) =
+    navigateOnClick(plantOverviewRoute, navOptions)
 
-@OptIn(ExperimentalResourceApi::class)
 fun NavGraphBuilder.plantOverviewScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
@@ -46,17 +40,13 @@ fun NavGraphBuilder.plantOverviewScreen(
     composable(
         route = plantOverviewRoute
     ) {
-        val lifecycleOwner = LocalLifecycleOwner.current
         val appName = stringResource(Res.string.app_name)
         OnStartEffect {
             scaffoldViewModel.apply {
                 reset(appName)
                 floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = {
-                            navController.navigateToPlantCreate(lifecycleOwner)
-                        },
-                    ) {
+                    val navigateToCreate: () -> Unit = navController.navigateToPlantCreate()
+                    FloatingActionButton(onClick = navigateToCreate) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = stringResource(Res.string.add_plant)

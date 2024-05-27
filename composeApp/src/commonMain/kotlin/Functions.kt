@@ -3,16 +3,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.dropUnlessResumed
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 
-fun composeNavigation(
-    lifecycleOwner: LifecycleOwner,
-    navigationFunction: () -> Unit
-) {
-    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-        navigationFunction()
-    }
-}
+@Composable
+fun NavController.navigateOnClick(route: String, navOptions: NavOptions? = null) =
+    dropUnlessResumed { navigate(route, navOptions) }
+
 
 @Composable
 fun OnStartEffect(onStart: () -> Unit) {

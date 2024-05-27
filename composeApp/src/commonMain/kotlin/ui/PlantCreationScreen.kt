@@ -12,18 +12,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import dataClasses.Plant
 import dataClasses.WateringInfo
@@ -38,27 +37,21 @@ import plantyful.composeapp.generated.resources.description
 import plantyful.composeapp.generated.resources.name
 import plantyful.composeapp.generated.resources.species
 import plantyful.composeapp.generated.resources.watering_cycle_in_days
+import ui.detail.PlantDetailViewModel
 import kotlin.time.Duration.Companion.days
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantCreationScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
     navController: NavController,
-    savePlant: (Plant) -> Unit,
-    plant: Plant? = null
+    savePlant: () -> Unit,
+    viewModel: PlantDetailViewModel
 ) {
-    LocalLifecycleOwner.current
-    val nameState = remember { mutableStateOf(plant?.name ?: "") }
-    val speciesState = remember { mutableStateOf(plant?.species ?: "") }
-    val pictureState = remember { mutableStateOf(plant?.picture) }
-    val descriptionState = remember { mutableStateOf(plant?.description ?: "") }
-    val cycleState = remember { mutableStateOf(plant?.wateringInfo?.cycle?.inWholeDays?.toInt()?.toString() ?: "") }
-    val lastTimeWateredDatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis =
-        plant?.wateringInfo?.lastTime?.toEpochDays()?.days?.inWholeMilliseconds
-            ?: Clock.System.now().toEpochMilliseconds()
+    viewModel.lastTimeWateredDatePickerState = rememberDatePickerState(
+        initialDisplayMode = DisplayMode.Input,
+        initialSelectedDateMillis = viewModel.lastTimeWatered
     )
 
 
@@ -72,54 +65,63 @@ fun PlantCreationScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val galleryManager = rememberGalleryManager { imageBitmap ->
-            imageBitmap?.let { pictureState.value = it }
+            imageBitmap?.let { viewModel.picture = it }
         }
 
         Button(galleryManager::launch) {
             Text("Choose picture")
         }
 
-        pictureState.value?.let { Image(it, null) }
+        viewModel.picture?.let { Image(it, null) }
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = nameState.value,
-            onValueChange = { value -> nameState.value = value},
+            value = viewModel.name,
+            onValueChange = { value -> viewModel.name = value},
             label = { Text(stringResource(Res.string.name)) }
         )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = speciesState.value,
-            onValueChange = { value -> speciesState.value = value},
+            value = viewModel.species,
+            onValueChange = { value -> viewModel.species = value},
             label = { Text(stringResource(Res.string.species)) }
         )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = descriptionState.value,
-            onValueChange = { value -> descriptionState.value = value},
+            value = viewModel.description,
+            onValueChange = { value -> viewModel.description = value},
             label = { Text(stringResource(Res.string.description)) }
         )
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = cycleState.value,
-            onValueChange = { value -> cycleState.value = value},
+            value = viewModel.cycle,
+            onValueChange = { value -> viewModel.cycle = value},
             label = { Text(stringResource(Res.string.watering_cycle_in_days)) }
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DatePicker(state = lastTimeWateredDatePickerState, modifier = Modifier.padding(16.dp))
+            viewModel.lastTimeWateredDatePickerState?.let {
+                DatePicker(
+                    state = it,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
 
             Text(
-                "Selected date timestamp: ${lastTimeWateredDatePickerState.selectedDateMillis ?: "no selection"}",
+                "Selected date timestamp: ${
+                    viewModel.lastTimeWateredDatePickerState?.selectedDateMillis
+                        ?: "no selection"
+                }",
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
             Text(
                 "Selected date: ${
-                    lastTimeWateredDatePickerState.selectedDateMillis?.let {
+                    viewModel.lastTimeWateredDatePickerState?.selectedDateMillis?.let {
                         Instant.fromEpochMilliseconds(it)
                             .toLocalDateTime(TimeZone.currentSystemDefault())
                             .date
@@ -135,25 +137,7 @@ fun PlantCreationScreen(
         ) {
             Button(
                 onClick = {
-                    val dateState = lastTimeWateredDatePickerState.selectedDateMillis?.let {
-                        Instant.fromEpochMilliseconds(it)
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
-                            .date
-                    }
-
-                    savePlant(
-                        (plant ?: Plant("")).copy(
-                            name = nameState.value,
-                            description = descriptionState.value.ifBlank { null },
-                            species = speciesState.value.ifBlank { null },
-                            picture = pictureState.value,
-                            wateringInfo = WateringInfo(
-                                cycle = cycleState.value.toInt().days,
-                                lastTime = dateState!!
-                            )
-                        )
-                    )
-
+                    savePlant()
                     navController.popBackStack()
                 },
                 modifier = Modifier.padding(8.dp),

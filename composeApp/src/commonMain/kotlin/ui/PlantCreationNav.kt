@@ -6,84 +6,58 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Dp
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import composeNavigation
 import dataClasses.Plant
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import navigateOnClick
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import plantyful.composeapp.generated.resources.Res
 import plantyful.composeapp.generated.resources.add_plant
 import plantyful.composeapp.generated.resources.edit_plant
 import plantyful.composeapp.generated.resources.save
+import ui.detail.PlantDetailViewModel
 
 const val plantCreationRoute = "create"
 
-fun NavController.navigateToPlantCreate(
-    lifecycleOwner: LifecycleOwner,
-    navOptions: NavOptions? = null,
-) {
-    composeNavigation(lifecycleOwner) {
-        this.navigate(plantCreationRoute, navOptions)
-    }
-}
+@Composable
+fun NavController.navigateToPlantCreate(navOptions: NavOptions? = null) =
+    navigateOnClick(plantCreationRoute, navOptions)
 
-fun NavController.navigateToPlantEdit(
-    lifecycleOwner: LifecycleOwner,
-    plantId: Long,
-    navOptions: NavOptions? = null,
-) {
-    composeNavigation(lifecycleOwner) {
-        this.navigate("$plantCreationRoute/$plantId", navOptions)
-    }
-}
+@Composable
+fun NavController.navigateToPlantEdit(plantId: Long, navOptions: NavOptions? = null) =
+    navigateOnClick("$plantCreationRoute/$plantId", navOptions)
 
-@OptIn(ExperimentalResourceApi::class)
 fun NavGraphBuilder.plantCreationScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
     navController: NavController,
     scaffoldViewModel: ScaffoldViewModel,
-    addPlant: (Plant) -> Unit,
+    addPlant: (Plant) -> Unit
 ) {
     composable(
         route = plantCreationRoute
     ) {
-        scaffoldViewModel.apply {
-            title = stringResource(Res.string.add_plant)
-            floatingActionButton = {}
-            actions = {
-                IconButton(
-                    onClick = {
-                        //TODO
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Save,
-                        contentDescription = stringResource(Res.string.save)
-                    )
-                }
-            }
-        }
-
-        PlantCreationScreen(
+        CreateEditScreen(
             paddingValues = paddingValues,
             horizontalPadding = horizontalPadding,
+            titleResource = Res.string.add_plant,
             navController = navController,
+            scaffoldViewModel = scaffoldViewModel,
             savePlant = addPlant
         )
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 fun NavGraphBuilder.plantEditScreen(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
@@ -100,31 +74,14 @@ fun NavGraphBuilder.plantEditScreen(
             val plantState: MutableState<Plant?> = remember { mutableStateOf(null) }
 
             plantState.value?.let { plant ->
-                val title = stringResource(Res.string.edit_plant)
-                OnStartEffect {
-                    scaffoldViewModel.apply {
-                        reset(title)
-                        actions = {
-                            IconButton(
-                                onClick = {
-                                    //TODO
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Save,
-                                    contentDescription = stringResource(Res.string.save)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                PlantCreationScreen(
+                CreateEditScreen(
                     paddingValues = paddingValues,
                     horizontalPadding = horizontalPadding,
+                    titleResource = Res.string.edit_plant,
                     navController = navController,
-                    plant = plant,
-                    savePlant = editPlant
+                    scaffoldViewModel = scaffoldViewModel,
+                    savePlant = editPlant,
+                    plant = plant
                 )
             }
 
@@ -135,4 +92,42 @@ fun NavGraphBuilder.plantEditScreen(
             }
         }
     }
+}
+
+@Composable
+private fun CreateEditScreen(
+    paddingValues: PaddingValues,
+    horizontalPadding: Dp,
+    titleResource: StringResource,
+    navController: NavController,
+    scaffoldViewModel: ScaffoldViewModel,
+    savePlant: (Plant) -> Unit,
+    plant: Plant? = null
+) {
+    val viewModel: PlantDetailViewModel = viewModel(factory = PlantDetailViewModel.factory(plant))
+    val onSave = { savePlant(viewModel.createModifiedPlant()) }
+
+    val title = stringResource(titleResource)
+    OnStartEffect {
+        scaffoldViewModel.apply {
+            reset(title)
+            actions = {
+                IconButton(onClick = onSave) {
+                    Icon(
+                        imageVector = Icons.Default.Save,
+                        contentDescription = stringResource(Res.string.save)
+                    )
+                }
+            }
+        }
+    }
+
+
+    PlantCreationScreen(
+        paddingValues = paddingValues,
+        horizontalPadding = horizontalPadding,
+        navController = navController,
+        savePlant = onSave,
+        viewModel = viewModel
+    )
 }
